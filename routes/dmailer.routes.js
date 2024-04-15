@@ -1,17 +1,20 @@
-import Router from 'express';
-import { addUser, getUser, login, logout } from '../controllers/user.controller.js';
+import Router from "express";
+import {
+  getUser,
+  login,
+  logout,
+  signup,
+} from "../controllers/user.controller.js";
+import verifyToken from "../middlewares/authJWT.js";
 
 const router = Router();
 
+router.post("/register", signup);
 
+router.get("/me", verifyToken, getUser);
 
-router.post('/register', addUser)
+router.post("/login", login);
 
-router.get('/:me', getUser);
-
-router.post('/login', login);
-
-router.post('/logout', logout)
-
+router.post("/logout", verifyToken, logout);
 
 export default router;

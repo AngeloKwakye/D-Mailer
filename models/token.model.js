@@ -1,8 +1,8 @@
-import { Schema, model } from "mongoose";
+import { Schema, model, Types } from "mongoose";
 
 const tokenSchema = new Schema({
-    userId: {type: String, required: true},
-    active: {type: String, required: true} 
+  userId: { type: Types.ObjectId, required: true },
+  active: { type: String, default: true },
 });
 
-export const TokenModel = model('Token', tokenSchema, 'tokens');
+export const TokenModel = model("Token", tokenSchema, "tokens");
