@@ -15,7 +15,7 @@ export const addMessages = async (req,res,next) => {
 
 export const getMessages = async (req, res, next) =>{
    try {
-     const messages = await MessagesModel.find({});
+     const messages = await MessagesModel.find(req.query);
      res.json(messages);
    } catch (error) {
     next(error);

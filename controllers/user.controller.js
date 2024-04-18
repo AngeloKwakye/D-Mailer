@@ -47,6 +47,7 @@ export const login = async (req, res, next) => {
       req.body.password,
       user.password
     );
+    console.log({passwordIsValid})
     if (!passwordIsValid) {
       return res.status(401).json({
         accessToken: null,
