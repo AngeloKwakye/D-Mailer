@@ -6,14 +6,15 @@ import {
   signup,
 } from "../controllers/user.controller.js";
 import verifyToken from "../middlewares/authJWT.js";
+import {validateSignUp, validatelogin} from "../middlewares/authValidator.js";
 
 const router = Router();
 
-router.post("/register", signup);
+router.post("/signup", validateSignUp, signup);
 
 router.get("/me", verifyToken, getUser);
 
-router.post("/login", login);
+router.post("/login", validatelogin, login);
 
 router.post("/logout", verifyToken, logout);
 

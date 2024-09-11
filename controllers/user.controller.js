@@ -3,10 +3,19 @@ import { TokenModel } from "../models/token.model.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { validationResult } from "express-validator";
+// import { validateSignUp } from '../middlewares/validator.js'
 
 dotenv.config();
 
 export const signup = async (req, res, next) => {
+
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json({
+      error: error.array()
+    });
+  };
   try {
     const user = {
       firstName: req.body.firstName,
@@ -26,13 +35,22 @@ export const signup = async (req, res, next) => {
 
 export const getUser = async (req, res, next) => {
   try {
-    res.json(req.user);
+    res.json({
+      status: true,
+      data: req.user
+    });
   } catch (error) {
     next(error);
   }
 };
 
 export const login = async (req, res, next) => {
+  const error = validationResult(req);
+  if (!error.isEmpty()) {
+    return res.status(400).json({
+      error: error.array()
+    });
+  };
   try {
     // Find user with email
     const user = await UserModel.findOne({ email: req.body.email });
@@ -47,23 +65,25 @@ export const login = async (req, res, next) => {
       req.body.password,
       user.password
     );
-    console.log({passwordIsValid})
     if (!passwordIsValid) {
       return res.status(401).json({
+        status: false,
         accessToken: null,
-        message: "Invalid Password!",
+        message: "Invalid username or password!",
       });
     }
     // Generate Access Token for User
-    const token = jwt.sign({ id: user.id }, process.env.API_SECRET_KEY, {
+    const token = jwt.sign({ id: user._id }, process.env.API_SECRET_KEY, {
       expiresIn: 86400,
     });
     // Keep a record of their token
     await TokenModel.create({ userId: user._id });
     // Return response
     res.status(200).json({
-      message: "Login successfull",
+      status: true,
+      message: "Login successful!",
       accessToken: token,
+      user: user
     });
   } catch (error) {
     next(error);
@@ -74,6 +94,10 @@ export const logout = async (req, res, next) => {
   try {
     // Deactivate all user tokens
     await TokenModel.updateMany({ userId: req.user._id }, { active: false });
+    res.status(200).json({
+      status: true,
+      message: "User logged out successfully!"
+    });
   } catch (error) {
     next(error);
   }
